@@ -14,23 +14,26 @@ public class OperationService {
     OperationDAO operationDAO = new OperationDAO();
 
     private static ClanService clanService = new ClanService();
+    public final static Object lock = new Object();
 
     public void createOperation(String reason, int sum) {
-        Hero currentHero = CurrentHero.getCurrentHero();
-        Clan currentClan = CurrentHero.getClan();
-        LocalDateTime currentDateTime = LocalDateTime.now();
+        synchronized (lock) {
+            Hero currentHero = CurrentHero.getCurrentHero();
+            Clan currentClan = CurrentHero.getClan();
+            LocalDateTime currentDateTime = LocalDateTime.now();
 
-        Operation operation = new Operation();
-        operation.setClan(currentClan);
-        operation.setHero(currentHero);
-        operation.setReason(reason);
-        operation.setSum(sum);
-        operation.setAmountBefore(currentClan.getGold());
-        operation.setAmountAfter(currentClan.getGold() + sum);
-        operation.setDateTime(currentDateTime);
-        operationDAO.save(operation);
+            Operation operation = new Operation();
+            operation.setClan(currentClan);
+            operation.setHero(currentHero);
+            operation.setReason(reason);
+            operation.setSum(sum);
+            operation.setAmountBefore(currentClan.getGold());
+            operation.setAmountAfter(currentClan.getGold() + sum);
+            operation.setDateTime(currentDateTime);
+            operationDAO.save(operation);
 
-        clanService.changeAmount(sum);
+            clanService.changeAmount(sum);
+        }
     }
 
     public void viewAllOperations() {

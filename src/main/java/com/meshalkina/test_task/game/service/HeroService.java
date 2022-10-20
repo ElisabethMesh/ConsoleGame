@@ -28,12 +28,11 @@ public class HeroService {
                 CurrentHero.setCurrentHero(heroDAO.findById(Long.parseLong(answer)));
             } else {
                 System.out.println("Нет такого варианта");
+                selectHero();
             }
             if (CurrentHero.getCurrentHero() != null) {
                 System.out.println("Вы выбрали персонажа " + CurrentHero.getCurrentHero().getName() + "\n");
                 clanService.suggestClanOptions();
-            } else {
-                selectHero();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

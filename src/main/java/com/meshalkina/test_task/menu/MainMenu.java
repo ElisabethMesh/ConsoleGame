@@ -1,7 +1,6 @@
 package com.meshalkina.test_task.menu;
 
 import com.meshalkina.test_task.game.service.HeroAddGoldService;
-import com.meshalkina.test_task.game.service.HeroService;
 import com.meshalkina.test_task.game.service.OperationService;
 import com.meshalkina.test_task.game.service.TaskService;
 import com.meshalkina.test_task.game.threads.ThreadGame;
@@ -12,7 +11,7 @@ import java.io.InputStreamReader;
 
 public class MainMenu {
     OperationService operationService = new OperationService();
-    HeroService heroService = new HeroService();
+    private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public void selectAction() {
         System.out.println("Выберите действие\n" +
@@ -23,18 +22,30 @@ public class MainMenu {
     }
 
     public void callingActions() {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+        try {
             String answer = br.readLine();
             if (answer.equals("1")) {
-                heroService.startGame();
+                new ThreadGame();
             } else if (answer.equals("2")) {
                 operationService.viewAllOperations();
                 selectAction();
             } else if (answer.equals("3")) {
                 HeroAddGoldService.closeStream();
                 TaskService.closeStream();
+                closeStream();
                 System.exit(0);
+            } else {
+                System.out.println("Нет такого варианта" + "\n");
+                selectAction();
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void closeStream() {
+        try {
+            br.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

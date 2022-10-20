@@ -13,13 +13,14 @@ public class HeroAddGoldService {
 
     public void addGoldToClan() {
         System.out.println("Введите сумму :");
-
         try {
             int gold = Integer.parseInt(br.readLine());
             operationService.createOperation("Пополнение казны игроком", gold);
             System.out.println("Вы пополнили казну на " + gold + ". Теперь баланс казны клана составляет " + CurrentHero.getClan().getGold() + "\n");
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (NumberFormatException n) {
+            System.out.println("Неверный формат");
         }
     }
 

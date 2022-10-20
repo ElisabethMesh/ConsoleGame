@@ -28,12 +28,11 @@ public class ClanService {
                 CurrentHero.setClan(clanDAO.findById(Long.valueOf(answer)));
             } else {
                 System.out.println("Нет такого варианта");
+                selectClan();
             }
             if (CurrentHero.getClan() != null) {
                 System.out.println("Вы в клане " + CurrentHero.getClan().getName() + "\n");
                 activityService.completeActivity();
-            } else {
-                selectClan();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -41,7 +40,10 @@ public class ClanService {
     }
 
     public void changeAmount(int sum) {
-        clanDAO.updateGold(CurrentHero.getClan(), sum);
-        CurrentHero.setClan(clanDAO.findById(CurrentHero.getClan().getId()));
+        synchronized (OperationService.lock) {
+            clanDAO.updateGold(CurrentHero.getClan(), sum);
+            CurrentHero.setClan(clanDAO.findById(CurrentHero.getClan().getId()));
+        }
     }
 }
+

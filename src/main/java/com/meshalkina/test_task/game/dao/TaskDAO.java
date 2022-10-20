@@ -3,23 +3,38 @@ package com.meshalkina.test_task.game.dao;
 import com.meshalkina.test_task.model.Task;
 import com.meshalkina.test_task.util.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskDAO {
     private static Connection connection = ConnectionManager.open();
 
-    public Task findRandomTask() {
+    public List<Task> findAll() {
+        List<Task> tasks = new ArrayList<>();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery
+                    ("SELECT * FROM tasks ORDER BY task_id");
+            while (resultSet.next()) {
+                Task task = getTaskFromResultSet(resultSet);
+                tasks.add(task);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tasks;
+    }
+
+    public Task findById(Long id) {
         Task task = null;
         try (PreparedStatement preparedStatement =
-                     connection.prepareStatement("SELECT * FROM tasks ORDER BY rand()")) {
+                     connection.prepareStatement("SELECT * FROM tasks WHERE task_id=?")) {
+            preparedStatement.setLong(1, id);
+
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
-            if (resultSet.next()) {
-                task = getTaskFromResultSet(resultSet);
-            }
+
+            task = getTaskFromResultSet(resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -31,14 +46,8 @@ public class TaskDAO {
 
         task.setId(resultSet.getLong("task_id"));
         task.setBody(resultSet.getString("body"));
-        task.setAnswer1(resultSet.getString("answer1"));
-        task.setAnswer2(resultSet.getString("answer2"));
-        task.setResult1(resultSet.getString("result1"));
-        task.setResult2(resultSet.getString("result2"));
-        task.setSalary1(resultSet.getInt("salary1"));
-        task.setSalary2(resultSet.getInt("salary2"));
+        task.setSalary(resultSet.getInt("salary"));
 
         return task;
     }
-
 }
